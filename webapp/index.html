@@ -24,23 +24,12 @@
         <img src="img/beta.png" width="240px" class="brand pull-left">
         <h1 style="margin: 20px 20px">Test Harness</h1>
         <div class="span4" ui-if="refreshing" ng-cloak spinner style="margin: 20px -20px"></div>
-        <p id="explain"></p>
       </div>
     </div>
     <div class="well">
       <h1>FYI - Using free text search in your queries with FatFractal</h1>
-      <p>This post demonstrates real examples of using free text search with FatFractal.</p>
+      <p>This web application demonstrates real examples of using free text search with FatFractal.</p>
     <div class="well">
-      <h2>The following Model is used with this post</h2>
-      <div class="well">
-        <p>function Movie() {<br>
-          &nbsp;&nbsp;&nbsp;&nbsp;this.title = null;<br>
-          &nbsp;&nbsp;&nbsp;&nbsp;this.description = null;<br>
-          &nbsp;&nbsp;&nbsp;&nbsp;this.year = null;<br>
-          &nbsp;&nbsp;&nbsp;&nbsp;return this;<br>
-          }
-        </p>
-      </div>
       <h4>You can see the data created by this app using the FatFractal DataBrowser (
         <a href = https://system.fatfractal.com/console/databrowser/databrowser.html?baseUrl=https://fyi.fatfractal.com/usingsearch target = _blank>
           here
@@ -55,25 +44,62 @@
       </h4>
     </div>
     <div class="well">
-      <h2>Click below to see all the Movie objects stored in the backend.</h2>
-      <div class="well">
-         <p>ff.getArrayFromUri("/ff/resources/Movies/", function(r) {<br>
-             &nbsp;&nbsp;&nbsp;&nbsp;// handle success<br>
-             }, function(code,message){<br>
-              &nbsp;&nbsp;&nbsp;&nbsp;// handle error<br>
-              });
-         </p>
-      </div>
-      <button id="get-all-movie-button" class="btn" onclick="getAllMovies()">Try it!</button>
+      <h2>First, - let's have a look at the two Movie objects stored in the backend.</h2>
+      <p>Query to be submitted: <br>&nbsp;&nbsp;&nbsp;&nbsp;/Movies/
+         <br>
+        Note: you can paste this query to the databrowser (
+          <a href = https://system.fatfractal.com/console/databrowser/databrowser.html?baseUrl=https://fyi.fatfractal.com/usingsearch target = _blank>
+            here
+          </a>
+        )
+      </p>
+      <button id="get-all-movie-button" class="btn" onclick="getAllMovies()">Get all Movies!</button>
       <br>
       <p id = "get-all-movie-response"></p>
+      <h3 id = "get-all-movie-explain"></h3>
     </div>
-      <input id="movies-search-any-input" type="text" class="input-medium search-query" value="family terrorized">
+    <div class="well">
+      <h2>Next, we will create a query that uses the contains_any operator (feel free to change the search terms).</h2>
+      <p>Query to be submitted: <br>&nbsp;&nbsp;&nbsp;&nbsp;/Movies/(description contains_any '<span id = "movies-search-any-query">family terrorized</span>')
+         <br>
+        Note: you can paste this query to the databrowser (
+          <a href = https://system.fatfractal.com/console/databrowser/databrowser.html?baseUrl=https://fyi.fatfractal.com/usingsearch target = _blank>
+            here
+          </a>
+        )
+      </p>
+      <input id="movies-search-any-input" onkeyup="showQueryAny()" type="text" class="input-medium search-query" value="family terrorized">
       <button id="movies-search-any-button" class="btn" onclick="searchAny()">Search Any!</button>
-    <p id = "movies-search-any-response"></p>
-      <input id="movies-search-all-input" type="text" class="input-medium search-query" value="family terrorized">
+      <p id = "movies-search-any-response"></p>
+      <h3 id = "movies-search-any-explain"></h3>
+    </div>
+    <div class="well">
+      <h2>Last, we will create a query that uses the contains_all operator (feel free to change the search terms).</h2>
+      <p>Query to be submitted: <br>&nbsp;&nbsp;&nbsp;&nbsp;/Movies/(description contains_all '<span id = "movies-search-all-query">family terrorized</span>')
+        <br>
+        Note: you can paste this query to the databrowser (
+          <a href = https://system.fatfractal.com/console/databrowser/databrowser.html?baseUrl=https://fyi.fatfractal.com/usingsearch target = _blank>
+          here
+          </a>
+        )
+      </p>
+      <input id="movies-search-all-input" onkeyup="showQueryAll()" type="text" class="input-medium search-query" value="family terrorized">
       <button id="movies-search-all-button" class="btn" onclick="searchAll()">Search All!</button>
-    <p id = "movies-search-all-response"></p>
+      <p id = "movies-search-all-response"></p>
+      <h3 id = "movies-search-all-explain"></h3>
+    </div>
+    <div class="well">
+      <h2>The following Model is used with this post</h2>
+      <div class="well">
+        <p>function Movie() {<br>
+          &nbsp;&nbsp;&nbsp;&nbsp;this.title = null;<br>
+          &nbsp;&nbsp;&nbsp;&nbsp;this.description = null;<br>
+          &nbsp;&nbsp;&nbsp;&nbsp;this.year = null;<br>
+          &nbsp;&nbsp;&nbsp;&nbsp;return this;<br>
+          }
+        </p>
+      </div>
+    </div>
   </div>
   </body>
   <script type='text/javascript'>
@@ -82,56 +108,28 @@
     var app = window.location.pathname.replace(re, "");
     var appName = app.slice(1);
     var host = window.location.hostname + (window.location.port ? ":" + window.location.port : "");
-    //baseEl.innerHTML = host + app;
-    var explainEl = document.getElementById('explain');
-    explainEl.innerHTML = "Application: " + appName + " is running on " + host;
     window.document.title = "Application: " + appName + " default index.html page"
-    var ff = new FatFractal();
   </script>
   <script type="text/javascript">
-  function Movie(obj) {
-     this.title = null;
-     this.description = null;
-     this.year = null;
-     if(obj) {
+    var ff = new FatFractal();
+    function Movie(obj) {
+      this.title = null;
+      this.description = null;
+      this.year = null;
+      if(obj) {
         this.title = obj.title;
         this.description = obj.description;
         this.year = obj.year;
-     }
-     return this;
-  }
-  function saveMovie() {
-     ff.login("test_user", "T3st_Us3r", function() {
-        var el = document.getElementById('movie-movies-response');
-        var m = new Movie();
-        m.title = "Argo";
-        m.description = "Argo is a 2012 historical drama thriller film directed by Ben Affleck.";
-        m.year =2012;
-        ff.createObjAtUri(m, "/Movies", function(resp) {
-           var mov = new Movie(resp);
-           var str = js_beautify(JSON.stringify(mov), {
-              indent_size: 4,
-              indent_char: '&nbsp;',
-              linefeed_char: '<br>'
-           });
-           elr.innerHTML = "<br><div class = 'well blue'>Movie was created in the  " +
-              resp.ffRL + " Collection with data: " +
-              str + "</div>";
-           console.log("Movie was created: " + JSON.stringify(resp));
-        }, function(code, msg) {
-           console.error("saveMovie() createObjAtUri Error: " + code + " " + msg);
-           elr.innerHTML = "<br><div class = 'well red'>Got an error: " + msg + "</div>";
-        });
-     }, function(code, msg) {
-        console.error("Error logging in: " + code + ", error message" + msg);
-     });
-  }
-  function getAllMovies() {
-     var elr = document.getElementById('get-all-movie-response');
-     ff.getArrayFromUri("/ff/resources/Movies/", function(movies) {
+      }
+      return this;
+    }
+    function getAllMovies() {
+      var elr = document.getElementById('get-all-movie-response');
+      var ele = document.getElementById('get-all-movie-explain');
+      ff.getArrayFromUri("/ff/resources/Movies/", function(movies) {
         console.log(movies.length + " Movie objects were retrieved: " + JSON.stringify(movies));
         var str = "";
-        var elStr = "";
+        var elrStr = "";
         var obj;
         if(movies.length <= 0) alert("No Movie objects found in the Movies Collection!");
         else {
@@ -145,11 +143,12 @@
                  indent_char: '&nbsp;',
                  linefeed_char: '<br>'
               });
-              elStr += "A " + movies[i].clazz + " object was retrieved from the  " +
+              elrStr += "A " + movies[i].clazz + " object was retrieved from the  " +
                  movies[i].ffRL + " Collection with data: " +
                  str + "<br>";
            }
-           elr.innerHTML = "<br><div class = 'well blue'>" + elStr + "</div>";
+           elr.innerHTML = "<br><div class = 'well blue'>" + elrStr + "</div>";
+           ele.innerHTML = "Note that this operation returned " + movies.length + " Movie Objects";
         }
      }, function(code, msg) {
         elr.innerHTML = "<br><div class = 'well red'>Got an error: " + msg + "</div>";
@@ -159,11 +158,13 @@
   function searchAll() {
      var eli = document.getElementById('movies-search-all-input');
      var elr = document.getElementById('movies-search-all-response');
+     var ele = document.getElementById('movies-search-all-explain');
      ff.getArrayFromUri("/ff/resources/Movies/(description contains_all '" + eli.value + "')", function(movies) {
         console.log(movies.length + " Movie objects were retrieved: " + JSON.stringify(movies));
         var str = "";
-        var elStr = "";
-        if(movies.length <= 0) elStr = "Search returned zero results.";
+        var elrStr = "";
+        var eleStr = "";
+        if(movies.length <= 0) elrStr = "Search returned zero results.";
         else {
            for(var i = 0; i < movies.length; i++) {
               var m = new Movie(movies[i]);
@@ -173,13 +174,15 @@
                  indent_char: '&nbsp;',
                  linefeed_char: '<br>'
               });
-              elStr += "Movie was retrieved from the  " +
+              elrStr += "Movie was retrieved from the  " +
                  movies[i].ffRL + " Collection with data: " +
                  str + "<br>";
               console.log("<Movie was retrieved: " + JSON.stringify(m));
            }
-        elr.innerHTML = "<br><div class = 'well blue'>" + elStr + "</div>";
         }
+        elr.innerHTML = "<br><div class = 'well blue'>" + elrStr + "</div>";
+        if(eli.value == "family terrorized") ele.innerHTML = "Notice that this query only returns one object since only one Movie contains both terms.";
+        else ele.innerHTML = "Your query returned " + movies.length + " Movie objects";
      }, function(code, msg) {
         elr.innerHTML = "<br><div class = 'well red'>Got an error: " + msg + "</div>";
         console.error("searchAll() getArrayFromUri Error: " + code + " " + msg);
@@ -188,11 +191,12 @@
   function searchAny() {
      var eli = document.getElementById('movies-search-any-input');
      var elr = document.getElementById('movies-search-any-response');
+     var ele = document.getElementById('movies-search-any-explain');
      ff.getArrayFromUri("/ff/resources/Movies/(description contains_any '" + eli.value + "')", function(movies) {
         console.log(movies.length + " Movie objects were retrieved: " + JSON.stringify(movies));
         var str = "";
-        var elStr = "";
-        if(movies.length <= 0) elStr = "Search returned zero results.";
+        var elrStr = "";
+        if(movies.length <= 0) elrStr = "Search returned zero results.";
         else {
            for(var i = 0; i < movies.length; i++) {
               var m = new Movie(movies[i]);
@@ -202,17 +206,30 @@
                  indent_char: '&nbsp;',
                  linefeed_char: '<br>'
               });
-              elStr += "Movie was retrieved from the  " +
+              elrStr += "Movie was retrieved from the  " +
                  movies[i].ffRL + " Collection with data: " +
                  str + "<br>";
               console.log("<Movie was retrieved: " + JSON.stringify(m));
            }
-        elr.innerHTML = "<br><div class = 'well blue'>" + elStr + "</div>";
         }
+        elr.innerHTML = "<br><div class = 'well blue'>" + elrStr + "</div>";
+        if(eli.value == "family terrorized") ele.innerHTML = "Notice that this query returns two objects since they both contain at least one of the terms.";
+        else ele.innerHTML = "Your query returned " + movies.length + " Movie objects";
      }, function(code, msg) {
         elr.innerHTML = "<br><div class = 'well red'>Got an error: " + msg + "</div>";
         console.error("searchAny() getArrayFromUri Error: " + code + " " + msg);
      });
+  }
+  function showQueryAny() {
+     var eli = document.getElementById('movies-search-any-input');
+     var elq = document.getElementById('movies-search-any-query');
+     var qs = "/ff/resources/Movies/(description contains_any '" + eli.value + "')";
+     elq.innerHTML = eli.value;
+  }
+  function showQueryAll() {
+     var eli = document.getElementById('movies-search-all-input');
+     var elq = document.getElementById('movies-search-all-query');
+     elq.innerHTML = eli.value;
   }
   </script>
 </html>
